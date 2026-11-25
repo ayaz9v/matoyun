@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sayı Yolculuğu</title><style>
+:root{--fs:1;--lh:1.5;--bg:#fff8e7;--tx:#1d2b4a;--cd:#fff;--bd:#1e66d0;--ac:#1e66d0;--at:#fff;--or:#ff9f1c}
+body.hc{--bg:#000;--tx:#ffeb3b;--cd:#000;--bd:#fff;--ac:#000;--at:#ffeb3b;--or:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:calc(18px*var(--fs))/var(--lh) system-ui,Arial,sans-serif}
+#bar{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--tx);position:sticky;top:0;z-index:9;font-size:15px;line-height:1.2}
+#bar button{background:var(--bg);color:var(--tx);border:2px solid var(--bg);min-height:44px;padding:4px 10px;border-radius:10px}
+#bar [aria-pressed=true]{outline:3px solid var(--or)}
+main{max-width:980px;margin:auto;padding:12px}
+button{font:inherit;border:3px solid var(--bd);border-radius:14px;background:var(--cd);color:var(--tx);padding:.4em .9em;min-height:2.6em;cursor:pointer}
+button:focus-visible{outline:4px solid var(--or);outline-offset:2px}
+.pri{background:var(--ac);color:var(--at)}
+button:disabled{opacity:.6;cursor:default}.x{text-decoration:line-through}.d:disabled{opacity:1}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(10em,1fr));gap:10px;margin:12px 0}
+.rh{display:flex;gap:12px;align-items:center;background:var(--cd);border:3px solid var(--bd);border-radius:18px;padding:10px;margin:8px 0}.rh b{font-size:2.4em}
+.nl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:14px 0}
+.chip{display:inline-block;min-width:2.4em;padding:.3em .6em;border:3px solid var(--bd);border-radius:14px;background:var(--cd);color:var(--tx);font-weight:800;font-size:1.3em;text-align:center}
+.chip.q{border-style:dashed}.d{border-width:6px}.ar{font-weight:700}
+.opts{display:grid;gap:8px;margin:10px 0}.row{display:flex;gap:6px}.opt{flex:1;font-size:1.3em;font-weight:800}
+#fb{min-height:3em;margin:10px 0;padding:10px;border:3px dashed var(--bd);border-radius:12px;font-weight:700}
+.sr{position:absolute;left:-9999px}progress{width:100%;height:1.2em}
+</style></head><body>
+<div id="bar" role="toolbar" aria-label="Erişilebilirlik çubuğu"><button id="bSes" aria-pressed="false">🔊 Sesli Okuma</button><button id="bBuyuk" aria-pressed="false">🔠 Büyük Yazı</button><button id="bA-" aria-label="Yazıyı küçült">A−</button><button id="bA+" aria-label="Yazıyı büyüt">A+</button><button id="bSatir">↕ Satır Aralığı</button><button id="bKont" aria-pressed="false">◐ Yüksek Kontrast</button><button id="bMenu">🏠 Ana Menü (Öğrenci Değiştir)</button><button id="bSifir">↺ Sıfırla</button></div>
+<main id="app"></main><div id="live" class="sr" aria-live="polite"></div><script>
+const ICERIK={ist:[
+{ad:"İkişer",r:"🌟",ogr:"İkişer sayarken her adımda 2 ekleriz: 2, 4, 6, 8. Geriye sayarken 2 çıkarırız: 8, 6, 4, 2.",g:[[2,2,1],[10,2,1],[20,2,-1]]},
+{ad:"Üçer",r:"🍀",ogr:"Üçer sayarken her adımda 3 ekleriz: 3, 6, 9, 12. Geriye sayarken 3 çıkarırız: 12, 9, 6, 3.",g:[[3,3,1],[12,3,1],[27,3,-1]]},
+{ad:"Dörder",r:"🔷",ogr:"Dörder sayarken her adımda 4 ekleriz: 4, 8, 12, 16. Geriye sayarken 4 çıkarırız: 16, 12, 8, 4.",g:[[4,4,1],[16,4,1],[40,4,-1]]},
+{ad:"Beşer",r:"🎈",ogr:"Beşer sayarken her adımda 5 ekleriz: 5, 10, 15, 20. Geriye sayarken 5 çıkarırız: 20, 15, 10, 5.",g:[[5,5,1],[25,5,1],[60,5,-1]]},
+{ad:"Onar",r:"🚀",ogr:"Onar sayarken her adımda 10 ekleriz: 10, 20, 30, 40. Geriye sayarken 10 çıkarırız: 40, 30, 20, 10.",g:[[10,10,1],[40,10,1],[90,10,-1]]},
+{ad:"100'e Kadar",r:"🏅",ogr:"Bir ileri sayarken 1 ekleriz: 46, 47, 48. Bir geri sayarken 1 çıkarırız: 73, 72, 71. 99'dan sonra 100 gelir.",g:[[46,1,1],[97,1,1],[73,1,-1]]},
+{ad:"1000'e Kadar",r:"🏆",ogr:"Yüzer sayarken yüzler basamağı değişir: 200, 300, 400. Onar sayarken onlar basamağı değişir: 970, 980, 990. 999'dan sonra 1000 gelir.",g:[[200,100,1],[800,100,-1],[970,10,1],[997,1,1]]}
+]};
+const PROFIL={
+"Ömer":{n:2,kisa:1},
+"Asel":{n:3,buyuk:1,kont:1,oto:1},
+"Nisa":{n:3,sade:1},
+"Akasya":{n:3,sade:1},
+"Kerem":{n:3,ip:1},
+"Enes":{n:4,ust:1},
+"Ebubekir":{n:4,ust:1},
+"Öğretmen":{n:3}};
+const S={fs:1,lh:1.5,hc:0,ses:0,kp:null};
+const DATA={},KEY="rz",$=i=>document.getElementById(i),app=$("app"),SS=window.speechSynthesis,P=()=>PROFIL[S.kp]||{n:3};
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+function btn(h,c,f,l){const b=el("button",c,h);b.type="button";b.onclick=f;if(l)b.setAttribute("aria-label",l);return b}
+function ses(t){if(!SS)return;SS.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="tr-TR";u.rate=.9;const v=SS.getVoices().find(x=>/^tr/i.test(x.lang));if(v)u.voice=v;SS.speak(u)}
+function oku(t){$("live").textContent=t;if(S.ses)ses(t)}
+function fb(t){$("fb").textContent=t;oku(t)}
+function fbox(){const f=el("div");f.id="fb";f.setAttribute("role","status");return f}
+function rehber(t){return el("div","rh","<b aria-hidden=\"true\">🦉</b><span>"+t+"</span>")}
+function ekle(n){app.append(n);n.scrollIntoView({block:"center",behavior:"smooth"})}
+function oku_l(q,l){return q+" "+l.map((v,i)=>"Seçenek "+"ABCD"[i]+": "+v+".").join(" ")}
+function opts(l,pick){const d=el("div","opts");l.forEach((v,i)=>{const r=el("div","row"),L="ABCD"[i],b=btn(L+") "+v,"opt",()=>pick(v,b),"Seçenek "+L+": "+v);r.append(b,btn("🔈","sp",()=>ses("Seçenek "+L+": "+v),"Seçenek "+L+" seslendir"));d.append(r)});return d}
+function uygula(){const s=document.documentElement.style;s.setProperty("--fs",S.fs);s.setProperty("--lh",S.lh);document.body.classList.toggle("hc",!!S.hc);$("bSes").setAttribute("aria-pressed",!!S.ses);$("bKont").setAttribute("aria-pressed",!!S.hc);$("bBuyuk").setAttribute("aria-pressed",S.fs>=1.5)}
+$("bSes").onclick=()=>{S.ses=+!S.ses;uygula();S.ses?ses("Sesli okuma açık"):SS&&SS.cancel()};
+$("bBuyuk").onclick=()=>{S.fs=S.fs>=1.5?1:1.5;uygula()};
+$("bA-").onclick=()=>{S.fs=Math.max(.8,+(S.fs-.1).toFixed(1));uygula()};
+$("bA+").onclick=()=>{S.fs=Math.min(2,+(S.fs+.1).toFixed(1));uygula()};
+$("bSatir").onclick=()=>{S.lh=S.lh>=2.5?1.4:+(S.lh+.4).toFixed(1);uygula()};
+$("bKont").onclick=()=>{S.hc=+!S.hc;uygula()};
+$("bMenu").onclick=menu;
+$("bSifir").onclick=()=>{if(S.kp){if(confirm(S.kp+" için ilerleme silinsin mi?")){S[KEY]=DATA[S.kp]={};harita()}}else if(confirm("Tüm öğrencilerin ilerlemesi silinsin mi?"))for(const k in DATA)delete DATA[k]};
+function menu(){Object.assign(S,{fs:1,lh:1.5,hc:0,ses:0,kp:null});uygula();SS&&SS.cancel();app.innerHTML="<h1>🦉 Sayı Yolculuğu</h1>";app.append(rehber("Merhaba! Ben Bilge Baykuş. Önce adını seç."));const g=el("div","g");Object.keys(PROFIL).forEach(k=>g.append(btn("<big>"+k+"</big>","pri",()=>basla(k),k)));app.append(g)}
+function basla(k){S.kp=k;S[KEY]=DATA[k]||(DATA[k]={});const p=P();if(p.buyuk)S.fs=1.5;if(p.kont)S.hc=1;if(p.oto)S.ses=1;uygula();harita()}
+function harita(){const I=ICERIK.ist,k=Object.keys(S.rz).length,t="Merhaba "+S.kp+"! Bir istasyon seç. Rozetler: "+k+" / "+I.length+".";app.innerHTML="";app.append(rehber(t));const g=el("div","g");I.forEach((s,i)=>{const d=S.rz[i];g.append(btn("<big>"+(d?s.r:i+1)+"</big><br>"+s.ad+(d?"<br>✔ Tamam":""),d?"":"pri",()=>ogren(i),(i+1)+". istasyon, "+s.ad+(d?", tamamlandı":"")))});app.append(g);if(k==I.length)app.append(rehber("🎉 Tüm rozetleri topladın! Harikasın!"));oku(t)}
+function ogren(i){const s=ICERIK.ist[i];app.innerHTML="";app.append(el("h2","",(i+1)+". İstasyon: "+s.ad),rehber(s.ogr),btn("▶ Başla","pri",()=>gorev(i,0))," ",btn("◀ Harita","",harita));oku(s.ogr)}
+function gorev(i,j){const s=ICERIK.ist[i],t=s.g[j];if(!t)return bitir(i);const p=P(),[b,a,y]=t,d=[0,1,2].map(k=>b+k*a*y),ans=b+3*a*y,ek=y>0?"ekleriz":"çıkarırız",op=y>0?"+":"−",kr="Her adımda "+a+" "+ek+": "+d[2]+" "+op+" "+a+" =",ip="İpucu: her adımda "+a+" "+ek+".",
+q=p.kisa?"Sıradaki sayıyı seç.":"Sayılara bak. Her adımda aynı sayı kadar değişiyor. Sıradaki sayı hangisi?",
+l=shuf([ans,...[ans+1,ans-1,ans+a,ans-a,ans+2,ans-2].filter((x,k,z)=>x>=0&&x!=ans&&z.indexOf(x)==k).slice(0,p.n-1)]),
+ar="<span class=\"ar\" aria-hidden=\"true\">"+(p.sade?"▶":"▶ "+op+a)+"</span>",sonra=()=>gorev(i,j+1),om=oku_l(d.join(", ")+" ve sıradaki sayı bilinmiyor. "+q,l);
+app.innerHTML="";
+const nl=el("div","nl",d.map(v=>"<span class=\"chip\">"+v+"</span>").concat("<span class=\"chip q\">❓</span>").join(ar)),h=el("p","",p.ip?ip:"");
+nl.setAttribute("role","img");nl.setAttribute("aria-label","Sayı dizisi: "+d.join(", ")+" ve sıradaki sayı bilinmiyor");
+app.append(el("h2","",s.ad+" · Görev "+(j+1)+"/"+s.g.length+" · "+(y>0?"İleri ➡":"Geri ⬅")),rehber(q),nl,h,opts(l,(v,bt)=>{
+if(v!==ans){bt.disabled=true;bt.classList.add("x");return fb((p.sade?"Sorun değil, birlikte bakalım! ":"Birlikte bakalım! ")+kr+" ? Tekrar dene.")}
+bt.classList.add("d");bt.textContent="✔ "+bt.textContent;app.querySelectorAll(".opt").forEach(x=>x.disabled=true);fb((p.sade?"Çok güzel, harikasın! ":"Doğru! ")+kr+" "+ans+".");
+if(!p.ust)return ekle(btn("Sonraki ▶","pri",sonra));
+const c="Her adımda "+a+" "+ek,gr=rehber("Neden "+ans+"? Gerekçeni seç.");ekle(gr);
+app.append(opts(shuf([c,"Her adımda "+(a+1)+" "+ek,"Her adımda "+a+" "+(y>0?"çıkarırız":"ekleriz")]),(w,b2)=>{if(w!==c){b2.disabled=true;b2.classList.add("x");return fb("Bu gerekçe sonucu açıklamıyor. Sayılar hangi yöne gidiyor? Her adımda kaç değişiyor? Tekrar dene.")}b2.classList.add("d");app.querySelectorAll(".opt").forEach(x=>x.disabled=true);fb("Doğru gerekçe! "+kr+" "+ans+".");ekle(btn("Sonraki ▶","pri",sonra))}))}),
+fbox(),btn("🔊 Soruyu ve seçenekleri oku","pri",()=>ses(om))," ",p.ip?"":btn("💡 İpucu","",()=>{h.textContent=ip;oku(ip)})," ",btn("◀ Harita","",harita));oku(om)}
+function bitir(i){const s=ICERIK.ist[i];S.rz[i]=1;app.innerHTML="";const t="Tebrikler "+S.kp+"! "+s.ad+" istasyonunu tamamladın. "+s.r+" "+s.ad+" Rozeti senin!";app.append(el("h2","",s.r+" Rozet kazandın!"),rehber(t),btn("◀ Haritaya dön","pri",harita));oku(t)}
+uygula();menu();
+</script></body></html>

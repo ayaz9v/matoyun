@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sayı Görevleri</title><style>
+:root{--fs:1;--lh:1.5;--bg:#fff8e7;--tx:#1d2b4a;--cd:#fff;--bd:#1e66d0;--ac:#1e66d0;--at:#fff;--or:#ff9f1c}
+body.hc{--bg:#000;--tx:#ffeb3b;--cd:#000;--bd:#fff;--ac:#000;--at:#ffeb3b;--or:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:calc(18px*var(--fs))/var(--lh) system-ui,Arial,sans-serif}
+#bar{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--tx);position:sticky;top:0;z-index:9;font-size:15px;line-height:1.2}
+#bar button{background:var(--bg);color:var(--tx);border:2px solid var(--bg);min-height:44px;padding:4px 10px;border-radius:10px}
+#bar [aria-pressed=true]{outline:3px solid var(--or)}
+main{max-width:980px;margin:auto;padding:12px}
+button{font:inherit;border:3px solid var(--bd);border-radius:14px;background:var(--cd);color:var(--tx);padding:.4em .9em;min-height:2.6em;cursor:pointer}
+button:focus-visible{outline:4px solid var(--or);outline-offset:2px}
+.pri{background:var(--ac);color:var(--at)}
+button:disabled{opacity:.6;cursor:default}.x{text-decoration:line-through}.d:disabled{opacity:1}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(10em,1fr));gap:10px;margin:12px 0}
+.rh{display:flex;gap:12px;align-items:center;background:var(--cd);border:3px solid var(--bd);border-radius:18px;padding:10px;margin:8px 0}.rh b{font-size:2.4em}
+.nl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:14px 0}
+.chip{display:inline-block;min-width:2.4em;padding:.3em .6em;border:3px solid var(--bd);border-radius:14px;background:var(--cd);color:var(--tx);font-weight:800;font-size:1.3em;text-align:center}
+.chip.q{border-style:dashed}.d{border-width:6px}.ar{font-weight:700}
+.opts{display:grid;gap:8px;margin:10px 0}.row{display:flex;gap:6px}.opt{flex:1;font-size:1.3em;font-weight:800}
+#fb{min-height:3em;margin:10px 0;padding:10px;border:3px dashed var(--bd);border-radius:12px;font-weight:700}
+.sr{position:absolute;left:-9999px}progress{width:100%;height:1.2em}
+</style></head><body>
+<div id="bar" role="toolbar" aria-label="Erişilebilirlik çubuğu"><button id="bSes" aria-pressed="false">🔊 Sesli Okuma</button><button id="bBuyuk" aria-pressed="false">🔠 Büyük Yazı</button><button id="bA-" aria-label="Yazıyı küçült">A−</button><button id="bA+" aria-label="Yazıyı büyüt">A+</button><button id="bSatir">↕ Satır Aralığı</button><button id="bKont" aria-pressed="false">◐ Yüksek Kontrast</button><button id="bMenu">🏠 Ana Menü (Öğrenci Değiştir)</button><button id="bSifir">↺ Sıfırla</button></div>
+<main id="app"></main><div id="live" class="sr" aria-live="polite"></div><script>
+const ICERIK={g:[
+{ad:"Sıra Kur · 100'e kadar",t:"sira",r:[[64,66,68,70],[95,90,85,80],[97,98,99,100]]},
+{ad:"Sıra Kur · 1000'e kadar",t:"sira",r:[[300,400,500,600],[900,800,700,600],[1000,990,980,970]]},
+{ad:"Ritmi Bul · 3, 4, 5",t:"ayikla",r:[[3,"Üçer",[9,10,12,15,16,18,20,22]],[4,"Dörder",[8,12,14,16,18,20,22,24]],[5,"Beşer",[15,20,22,25,31,35,40,48]]]},
+{ad:"Ritmi Bul · onar, yüzer",t:"ayikla",r:[[10,"Onar",[30,35,40,55,60,70,75,90]],[100,"Yüzer",[200,250,300,450,500,525,700,900]],[10,"Onar",[320,330,335,350,360,365,380,395]]]},
+{ad:"Karar Ver · 100'e kadar",t:"senaryo",r:[
+{h:"Defne rafa 5'er kitap koyuyor. Rafta 35 kitap var. Bir tur sonra rafta kaç kitap olur?",s:[40,36,30],n:["Her turda 5 kitap eklenir: 35 + 5 = 40","Her turda 1 kitap eklenir","Her turda 5 kitap çıkarılır"]},
+{h:"Mert'in 60 lirası var. Her gün 10 lira harcıyor. Bir gün sonra kaç lirası kalır?",s:[50,70,59],n:["Her gün 10 çıkar: 60 − 10 = 50","Her gün 10 eklenir","Her gün 1 çıkar"]},
+{h:"Öğrenciler ikişer ikişer sıraya giriyor. 18 öğrenci girdi. 2 öğrenci daha girerse kaç öğrenci olur?",s:[20,19,16],n:["Her seferde 2 öğrenci eklenir: 18 + 2 = 20","Her seferde 1 öğrenci eklenir","Her seferde 2 öğrenci çıkar"]}]},
+{ad:"Karar Ver · 1000'e kadar",t:"senaryo",r:[
+{h:"Depoya her gün 100 kutu geliyor. Bugün 400 kutu var. Yarın kaç kutu olur?",s:[500,410,300],n:["Her gün 100 eklenir, yüzler basamağı 1 artar: 400 → 500","Her gün 10 eklenir","Her gün 100 çıkar"]},
+{h:"Roketin geri sayımı yüzer yüzer azalıyor: 900, 800, 700. Sıradaki sayı kaç?",s:[600,690,800],n:["Yüzer geri sayarken yüzler basamağı 1 azalır: 700 → 600","Yüzler basamağı 1 artar: 700 → 800","Onlar basamağı 1 azalır: 700 → 690"]},
+{h:"Sayaç 998, 999 gösteriyor. Bir ileri sayarsak sıradaki sayı kaç olur?",s:[1000,990,900],n:["999'dan sonra 1000 gelir: 999 + 1 = 1000","999'dan sonra 990 gelir","999'dan sonra 900 gelir"]}]}
+]};
+const PROFIL={
+"Ömer":{n:2,kisa:1},
+"Asel":{n:3,buyuk:1,kont:1,oto:1},
+"Nisa":{n:3,sade:1},
+"Akasya":{n:3,sade:1},
+"Kerem":{n:3,ip:1},
+"Enes":{n:4,ust:1},
+"Ebubekir":{n:4,ust:1},
+"Öğretmen":{n:3}};
+const S={fs:1,lh:1.5,hc:0,ses:0,kp:null,h:0};
+const DATA={},KEY="y",$=i=>document.getElementById(i),app=$("app"),SS=window.speechSynthesis,P=()=>PROFIL[S.kp]||{n:3};
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+function btn(h,c,f,l){const b=el("button",c,h);b.type="button";b.onclick=f;if(l)b.setAttribute("aria-label",l);return b}
+function ses(t){if(!SS)return;SS.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="tr-TR";u.rate=.9;const v=SS.getVoices().find(x=>/^tr/i.test(x.lang));if(v)u.voice=v;SS.speak(u)}
+function oku(t){$("live").textContent=t;if(S.ses)ses(t)}
+function fb(t){$("fb").textContent=t;oku(t)}
+function fbox(){const f=el("div");f.id="fb";f.setAttribute("role","status");return f}
+function rehber(t){return el("div","rh","<b aria-hidden=\"true\">🦉</b><span>"+t+"</span>")}
+function ekle(n){app.append(n);n.scrollIntoView({block:"center",behavior:"smooth"})}
+function oku_l(q,l){return q+" "+l.map((v,i)=>"Seçenek "+"ABCD"[i]+": "+v+".").join(" ")}
+function opts(l,pick){const d=el("div","opts");l.forEach((v,i)=>{const r=el("div","row"),L="ABCD"[i],b=btn(L+") "+v,"opt",()=>pick(v,b),"Seçenek "+L+": "+v);r.append(b,btn("🔈","sp",()=>ses("Seçenek "+L+": "+v),"Seçenek "+L+" seslendir"));d.append(r)});return d}
+function uygula(){const s=document.documentElement.style;s.setProperty("--fs",S.fs);s.setProperty("--lh",S.lh);document.body.classList.toggle("hc",!!S.hc);$("bSes").setAttribute("aria-pressed",!!S.ses);$("bKont").setAttribute("aria-pressed",!!S.hc);$("bBuyuk").setAttribute("aria-pressed",S.fs>=1.5)}
+$("bSes").onclick=()=>{S.ses=+!S.ses;uygula();S.ses?ses("Sesli okuma açık"):SS&&SS.cancel()};
+$("bBuyuk").onclick=()=>{S.fs=S.fs>=1.5?1:1.5;uygula()};
+$("bA-").onclick=()=>{S.fs=Math.max(.8,+(S.fs-.1).toFixed(1));uygula()};
+$("bA+").onclick=()=>{S.fs=Math.min(2,+(S.fs+.1).toFixed(1));uygula()};
+$("bSatir").onclick=()=>{S.lh=S.lh>=2.5?1.4:+(S.lh+.4).toFixed(1);uygula()};
+$("bKont").onclick=()=>{S.hc=+!S.hc;uygula()};
+$("bMenu").onclick=menu;
+$("bSifir").onclick=()=>{if(S.kp){if(confirm(S.kp+" için ilerleme silinsin mi?")){S[KEY]=DATA[S.kp]={};harita()}}else if(confirm("Tüm öğrencilerin ilerlemesi silinsin mi?"))for(const k in DATA)delete DATA[k]};
+function menu(){Object.assign(S,{fs:1,lh:1.5,hc:0,ses:0,kp:null,h:0});uygula();SS&&SS.cancel();app.innerHTML="<h1>🦉 Sayı Görevleri</h1>";app.append(rehber("Merhaba! Ben Bilge Baykuş. Önce adını seç."));const g=el("div","g");Object.keys(PROFIL).forEach(k=>g.append(btn("<big>"+k+"</big>","pri",()=>basla(k),k)));app.append(g)}
+function basla(k){S.kp=k;S[KEY]=DATA[k]||(DATA[k]={});const p=P();if(p.buyuk)S.fs=1.5;if(p.kont)S.hc=1;if(p.oto)S.ses=1;uygula();harita()}
+const toplam=()=>Object.values(S.y).reduce((a,b)=>a+b,0);
+function harita(){const G=ICERIK.g,T=toplam(),mx=G.length*3,t="Merhaba "+S.kp+"! Bir görev seç. Yıldızların: "+T+" / "+mx+".";app.innerHTML="";app.append(rehber(t));const pr=el("progress");pr.max=mx;pr.value=T;pr.setAttribute("aria-label","Yıldız ilerlemesi");app.append(el("p","","⭐ "+T+" / "+mx),pr);const g=el("div","g");G.forEach((m,i)=>{const y=S.y[i]||0;g.append(btn("<big>"+(i+1)+"</big><br>"+m.ad+"<br>"+(y?"⭐".repeat(y)+"☆".repeat(3-y)+" ✔":"☆☆☆"),y?"":"pri",()=>gorev(i,0),(i+1)+". görev: "+m.ad+". "+(y?y+" yıldız, tamamlandı":"henüz yapılmadı")))});app.append(g);if(Object.keys(S.y).length==G.length)app.append(rehber("🎉 Tüm görevler tamam! Süpersin!"));oku(t)}
+function gorev(i,j){const m=ICERIK.g[i];if(!j)S.h=0;if(j>=m.r.length)return bitir(i);app.innerHTML="";app.append(el("h2","",m.ad+" · Tur "+(j+1)+"/"+m.r.length));({sira,ayikla,senaryo})[m.t](m.r[j],()=>gorev(i,j+1))}
+function alt(ip,om){const h=el("p"),p=P();if(p.ip)h.textContent=ip;app.append(h,fbox(),btn("🔊 Oku","pri",()=>ses(om))," ",p.ip?"":btn("💡 İpucu","",()=>{h.textContent=ip;oku(ip)})," ",btn("◀ Harita","",harita));oku(om)}
+function tamam(m,nx){fb((P().sade?"Harika! ":"Doğru! ")+"✔ "+m);app.querySelectorAll(".opt,.crd,.kt").forEach(x=>x.disabled=true);ekle(btn("Sonraki ▶","pri",nx))}
+function sira(r,nx){const d=P().kisa?r.slice(0,3):r,y=d[1]>d[0]?1:-1,a=Math.abs(d[1]-d[0]),op=y>0?"+":"−",ek=y>0?"ekleriz":"çıkarırız",sh=shuf(d);let k=0;
+const tl=y>0?"Kartlara küçükten büyüğe sırayla dokun. (İleri sayma ➡)":"Kartlara büyükten küçüğe sırayla dokun. (Geriye sayma ⬅)";
+const sl=el("div","nl",d.map(()=>"<span class=\"chip q\">?</span>").join("")),cr=el("div","nl");
+app.append(rehber(tl),sl);
+sh.forEach(v=>{const b=btn(v,"chip crd",()=>{if(v===d[k]){b.disabled=true;b.classList.add("d");b.textContent="✔ "+v;const c=sl.children[k];c.textContent=v;c.classList.remove("q");k++;if(k==d.length)tamam("Sıra: "+d.join(", ")+". Her adımda "+a+" "+ek+".",nx)}else{S.h++;fb(k?d[k-1]+" sayısından sonra "+a+" "+ek+": "+d[k-1]+" "+op+" "+a+" = ? Tekrar dene.":(y>0?"İleri sayarken en küçük sayıyla başlarız. Tekrar dene.":"Geriye sayarken en büyük sayıyla başlarız. Tekrar dene."))}},"Kart "+v);cr.append(b)});
+app.append(cr);alt("İpucu: "+(y>0?"ileri sayarken sayılar büyür":"geriye sayarken sayılar küçülür")+"; her adımda "+a+" "+ek+".",tl+" Kartlar: "+sh.join(", ")+".")}
+function ayikla(r,nx){const [a,ad,l0]=r,l=P().kisa?l0.slice(0,6):l0,dg=l.filter(x=>x%a==0),sel=new Set(),m0=Math.min(...dg),ex=m0+", "+(m0+a)+", "+(m0+2*a),
+tl=ad+" sayarken söylenen sayıların hepsine dokun. Sonra \"Kontrol Et\" düğmesine bas.";
+app.append(rehber(tl));const g=el("div","nl");
+l.forEach(v=>{const b=btn(v,"chip crd",()=>{sel.has(v)?sel.delete(v):sel.add(v);const on=sel.has(v);b.classList.toggle("d",on);b.textContent=(on?"✔ ":"")+v;b.setAttribute("aria-pressed",on)},"Sayı "+v);b.setAttribute("aria-pressed","false");g.append(b)});
+app.append(g,btn("✅ Kontrol Et","pri kt",()=>{const w=[...sel].filter(x=>!dg.includes(x)),e=dg.filter(x=>!sel.has(x));if(!w.length&&!e.length)return tamam(ad+" sayarken söylenen sayılar: "+dg.join(", ")+".",nx);S.h++;fb((w.length?w.join(", ")+" bu ritme uymuyor. ":"")+(e.length?"Bazı sayılar eksik. ":"")+ad+" sayarken her adımda "+a+" artar: "+ex+"… Tekrar dene.")}));
+alt("İpucu: her adımda "+a+" artar: "+ex+"…",tl+" Sayılar: "+l.join(", ")+".")}
+function senaryo(r,nx){const p=P(),l=shuf(r.s.slice(0,p.n)),ok=r.s[0];app.append(rehber(r.h));
+const pick=(v,b)=>{if(v!==ok){b.disabled=true;b.classList.add("x");S.h++;return fb("Hikâyeye tekrar bak. Sayı artıyor mu, azalıyor mu? Her seferinde kaç değişiyor?")}
+b.classList.add("d");b.textContent="✔ "+v;app.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+if(!p.ust)return tamam(r.n[0]+".",nx);
+fb("Doğru karar! Şimdi gerekçeni seç.");ekle(rehber("Neden "+ok+"? Gerekçeni seç."));
+app.append(opts(shuf(r.n),(w,b2)=>{if(w!==r.n[0]){b2.disabled=true;b2.classList.add("x");S.h++;return fb("Bu gerekçe hikâyeyle uyuşmuyor. Tekrar dene.")}b2.classList.add("d");b2.textContent="✔ "+w;tamam(r.n[0]+".",nx)}))};
+app.append(opts(l,pick));alt("İpucu: önce sayının artıp azaldığına karar ver.",oku_l(r.h,l))}
+function bitir(i){const st=S.h==0?3:S.h<3?2:1;S.y[i]=Math.max(S.y[i]||0,st);app.innerHTML="";const t="Görev tamam "+S.kp+"! "+st+" yıldız kazandın.";app.append(el("h2","","⭐".repeat(st)+"☆".repeat(3-st)),rehber(t+(st<3?" Daha az tekrarla 3 yıldız alabilirsin.":" Hiç tekrar yapmadan bitirdin!")),btn("◀ Haritaya dön","pri",harita));oku(t)}
+uygula();menu();
+</script></body></html>
